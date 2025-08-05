@@ -29,10 +29,9 @@ app.route('/api/user', userRoutes);
 app.route('/api/places', placesRoutes);
 app.route('/api/reviews', reviewsRoutes);
 
-// SPAのルートファイル配信
-app.get('/', serveStatic({ path: './index.html', manifest: {} }));
-
-// その他の静的ファイル
-app.get('*', serveStatic({ manifest: {} }));
+// APIルート以外は何も処理しない（Cloudflare Pagesで静的ファイルを処理）
+app.notFound((c) => {
+  return c.text('Not Found', 404);
+});
 
 export default app;
