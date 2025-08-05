@@ -1,4 +1,4 @@
-name = "lunch-recommendation-app"
+name = 'lunch-map'
 main = "src/api/index.ts"
 compatibility_date = "2024-01-01"
 
