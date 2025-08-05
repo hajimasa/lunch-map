@@ -2,6 +2,9 @@ name = 'lunch-map'
 main = "src/api/index.ts"
 compatibility_date = "2024-01-01"
 
+[site]
+bucket = "./dist"
+
 [env.production]
 vars = { ENVIRONMENT = "production" }
 

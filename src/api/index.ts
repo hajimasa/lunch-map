@@ -1,7 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { jwt } from 'hono/jwt';
-import { googleAuth } from '@hono/oauth-providers/google';
+import { serveStatic } from 'hono/cloudflare-workers';
 import { authRoutes } from './routes/auth';
 import { userRoutes } from './routes/user';
 import { placesRoutes } from './routes/places';
@@ -30,8 +29,10 @@ app.route('/api/user', userRoutes);
 app.route('/api/places', placesRoutes);
 app.route('/api/reviews', reviewsRoutes);
 
-app.get('/', (c) => {
-  return c.json({ message: 'Lunch Recommendation API' });
-});
+// SPAのルートファイル配信
+app.get('/', serveStatic({ path: './index.html' }));
+
+// その他の静的ファイル
+app.get('*', serveStatic());
 
 export default app;
