@@ -1,0 +1,33 @@
+name = "lunch-recommendation-app"
+main = "src/api/index.ts"
+compatibility_date = "2024-01-01"
+
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+[env.staging]
+vars = { ENVIRONMENT = "staging" }
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "lunch-app-db"
+database_id = "your-database-id"
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "lunch-app-db-staging"
+database_id = "your-staging-database-id"
+
+[[env.production.r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "lunch-app-images"
+
+[[env.staging.r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "lunch-app-images-staging"
+
+[vars]
+GOOGLE_CLIENT_ID = "your-google-client-id"
+GOOGLE_CLIENT_SECRET = "your-google-client-secret"
+JWT_SECRET = "your-jwt-secret"
+GOOGLE_MAPS_API_KEY = "your-google-maps-api-key"

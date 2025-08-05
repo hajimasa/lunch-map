@@ -1,0 +1,35 @@
+{
+  "name": "lunch-recommendation-app",
+  "version": "1.0.0",
+  "description": "A lunch restaurant recommendation app using location-based search and user reviews",
+  "main": "src/api/index.ts",
+  "scripts": {
+    "dev": "wrangler dev src/api/index.ts",
+    "deploy": "wrangler deploy",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "frontend:dev": "vite",
+    "frontend:build": "vite build",
+    "db:generate": "wrangler d1 execute lunch-app-db --local --file=./migrations/schema.sql",
+    "db:migrate": "wrangler d1 execute lunch-app-db --file=./migrations/schema.sql",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "^4.0.0",
+    "@hono/oauth-providers": "^0.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@googlemaps/js-api-loader": "^1.16.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240000.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "wrangler": "^3.0.0"
+  },
+  "type": "module"
+}
