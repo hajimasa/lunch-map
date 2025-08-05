@@ -30,9 +30,9 @@ app.route('/api/places', placesRoutes);
 app.route('/api/reviews', reviewsRoutes);
 
 // SPAのルートファイル配信
-app.get('/', serveStatic({ path: './index.html' }));
+app.get('/', serveStatic({ path: './index.html', manifest: {} }));
 
 // その他の静的ファイル
-app.get('*', serveStatic());
+app.get('*', serveStatic({ manifest: {} }));
 
 export default app;

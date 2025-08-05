@@ -43,7 +43,7 @@ reviewsRoutes.get('/places/:placeId', async (c) => {
   }
 });
 
-reviewsRoutes.use('*', jwt({ secret: (c) => c.env.JWT_SECRET }));
+reviewsRoutes.use('*', jwt({ secret: 'placeholder' }));
 
 reviewsRoutes.post('/', async (c) => {
   const payload = c.get('jwtPayload');

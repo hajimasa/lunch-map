@@ -31,7 +31,7 @@ placesRoutes.get('/nearby', async (c) => {
     }
 
     const response = await fetch(searchUrl.toString());
-    const data = await response.json();
+    const data: any = await response.json();
 
     if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
       return c.json({ error: 'Failed to fetch places' }, 500);
@@ -60,7 +60,7 @@ placesRoutes.get('/details/:placeId', async (c) => {
     detailsUrl.searchParams.set('key', c.env.GOOGLE_MAPS_API_KEY);
 
     const response = await fetch(detailsUrl.toString());
-    const data = await response.json();
+    const data: any = await response.json();
 
     if (data.status !== 'OK') {
       return c.json({ error: 'Place not found' }, 404);

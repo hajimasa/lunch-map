@@ -16,7 +16,7 @@ async function apiRequest(endpoint: string, options: RequestInit = {}) {
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: 'Network error' }));
+    const error: any = await response.json().catch(() => ({ error: 'Network error' }));
     throw new Error(error.error || 'API request failed');
   }
 
@@ -42,7 +42,7 @@ export const api = {
 
   // Reviews API
   getPlaceReviews: async (placeId: string): Promise<Review[]> => {
-    return apiRequest(`/reviews/places/${placeId}`);
+    return apiRequest(`/reviews/places/${placeId}`) as Promise<Review[]>;
   },
 
   createReview: async (review: ReviewRequest) => {
@@ -79,7 +79,7 @@ export const api = {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Upload failed' }));
+      const error: any = await response.json().catch(() => ({ error: 'Upload failed' }));
       throw new Error(error.error || 'Image upload failed');
     }
 

@@ -13,46 +13,75 @@ type Bindings = {
 export const authRoutes = new Hono<{ Bindings: Bindings }>();
 
 authRoutes.get('/google', async (c) => {
-  return googleAuth({
-    client_id: c.env.GOOGLE_CLIENT_ID,
-    client_secret: c.env.GOOGLE_CLIENT_SECRET,
-    redirect_uri: `${new URL(c.req.url).origin}/api/auth/callback`,
-    scope: ['openid', 'email', 'profile'],
-  })(c);
+  const client_id = c.env.GOOGLE_CLIENT_ID;
+  const client_secret = c.env.GOOGLE_CLIENT_SECRET;
+  const redirect_uri = `${new URL(c.req.url).origin}/api/auth/callback`;
+  
+  const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+  authUrl.searchParams.set('client_id', client_id);
+  authUrl.searchParams.set('redirect_uri', redirect_uri);
+  authUrl.searchParams.set('response_type', 'code');
+  authUrl.searchParams.set('scope', 'openid email profile');
+  
+  return c.redirect(authUrl.toString());
 });
 
 authRoutes.get('/callback', async (c) => {
-  const { token } = await googleAuth({
-    client_id: c.env.GOOGLE_CLIENT_ID,
-    client_secret: c.env.GOOGLE_CLIENT_SECRET,
-    redirect_uri: `${new URL(c.req.url).origin}/api/auth/callback`,
-    scope: ['openid', 'email', 'profile'],
-  })(c);
-
-  if (!token) {
-    return c.json({ error: 'Authentication failed' }, 401);
+  const code = c.req.query('code');
+  if (!code) {
+    return c.json({ error: 'Authorization code missing' }, 400);
   }
 
-  const userInfo = token.user;
-  
   try {
-    let user = await c.env.DB.prepare(
-      'SELECT * FROM users WHERE google_id = ?'
-    ).bind(userInfo.sub).first<User>();
+    const client_id = c.env.GOOGLE_CLIENT_ID;
+    const client_secret = c.env.GOOGLE_CLIENT_SECRET;
+    const redirect_uri = `${new URL(c.req.url).origin}/api/auth/callback`;
 
-    if (!user) {
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        code,
+        client_id,
+        client_secret,
+        redirect_uri,
+        grant_type: 'authorization_code',
+      }),
+    });
+
+    const tokenData = await tokenResponse.json() as any;
+    
+    if (!tokenData.access_token) {
+      return c.json({ error: 'Failed to get access token' }, 401);
+    }
+
+    const userResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: {
+        'Authorization': `Bearer ${tokenData.access_token}`,
+      },
+    });
+
+    const userInfo = await userResponse.json() as any;
+
+    let dbUser = await c.env.DB.prepare(
+      'SELECT * FROM users WHERE google_id = ?'
+    ).bind(userInfo.id).first<User>();
+
+    if (!dbUser) {
       const result = await c.env.DB.prepare(`
         INSERT INTO users (google_id, email, name, avatar_url)
         VALUES (?, ?, ?, ?)
         RETURNING *
       `).bind(
-        userInfo.sub,
+        userInfo.id,
         userInfo.email,
         userInfo.name,
         userInfo.picture
       ).first<User>();
       
-      user = result;
+      dbUser = result;
     } else {
       await c.env.DB.prepare(`
         UPDATE users 
@@ -62,16 +91,16 @@ authRoutes.get('/callback', async (c) => {
         userInfo.email,
         userInfo.name,
         userInfo.picture,
-        userInfo.sub
+        userInfo.id
       ).run();
     }
 
-    if (!user) {
+    if (!dbUser) {
       return c.json({ error: 'Failed to create user' }, 500);
     }
 
     const jwtToken = await sign(
-      { sub: user.id, email: user.email },
+      { sub: dbUser.id, email: dbUser.email },
       c.env.JWT_SECRET
     );
 

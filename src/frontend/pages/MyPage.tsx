@@ -15,7 +15,7 @@ export default function MyPage() {
 
   const fetchUserReviews = async () => {
     try {
-      const userReviews = await api.getUserReviews();
+      const userReviews = await api.getUserReviews() as Review[];
       setReviews(userReviews);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'レビューの取得に失敗しました');

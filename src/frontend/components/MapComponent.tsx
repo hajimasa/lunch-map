@@ -27,7 +27,7 @@ export default function MapComponent({ center, places, onPlaceSelect }: MapCompo
     if (!mapRef.current) return;
 
     const loader = new Loader({
-      apiKey: process.env.VITE_GOOGLE_MAPS_API_KEY || '',
+      apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
       version: 'weekly',
     });
 

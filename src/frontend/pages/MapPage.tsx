@@ -28,7 +28,7 @@ export default function MapPage() {
         open_now: openNowOnly,
       });
 
-      setPlaces(response.results || []);
+      setPlaces((response as any).results || []);
     } catch (error) {
       setError(error instanceof Error ? error.message : '店舗の検索に失敗しました');
     } finally {

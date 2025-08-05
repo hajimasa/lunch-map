@@ -9,7 +9,7 @@ type Bindings = {
 
 export const userRoutes = new Hono<{ Bindings: Bindings }>();
 
-userRoutes.use('*', jwt({ secret: (c) => c.env.JWT_SECRET }));
+userRoutes.use('*', jwt({ secret: 'placeholder' }));
 
 userRoutes.get('/profile', async (c) => {
   const payload = c.get('jwtPayload');

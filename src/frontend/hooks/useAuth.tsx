@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (response.ok) {
-        const userData = await response.json();
+        const userData: any = await response.json();
         setUser({
           id: userData.id,
           name: userData.name,
